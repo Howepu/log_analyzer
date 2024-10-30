@@ -36,6 +36,8 @@ public class LogAnalyzerApp {
         LocalDate from = null;
         LocalDate to = null;
         String outputFormat = null;
+        String filterField = null;
+        String filterValue = null;
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         int i = 1;
@@ -43,45 +45,28 @@ public class LogAnalyzerApp {
             String currentArg = args[i];
             switch (currentArg) {
                 case "--path":
-                    if (i + 1 < args.length) {
-                        path = args[i + 1];
-                        i += 2;  // Пропускаем следующий аргумент
-                    } else {
-                        log.error("Ошибка: не указан путь к лог-файлам.");
-                        System.exit(1);
-                    }
+                    path = args[++i];
                     break;
                 case "--from":
-                    if (i + 1 < args.length) {
-                        from = LocalDate.parse(args[i + 1], dateFormatter);
-                        i += 2;  // Пропускаем следующий аргумент
-                    } else {
-                        log.error("Ошибка: не указана начальная дата.");
-                        System.exit(1);
-                    }
+                    from = LocalDate.parse(args[++i], dateFormatter);
                     break;
                 case "--to":
-                    if (i + 1 < args.length) {
-                        to = LocalDate.parse(args[i + 1], dateFormatter);
-                        i += 2;  // Пропускаем следующий аргумент
-                    } else {
-                        log.error("Ошибка: не указана конечная дата.");
-                        System.exit(1);
-                    }
+                    to = LocalDate.parse(args[++i], dateFormatter);
                     break;
                 case "--format":
-                    if (i + 1 < args.length) {
-                        outputFormat = args[i + 1];
-                        i += 2;  // Пропускаем следующий аргумент
-                    } else {
-                        log.error("Ошибка: не указан формат вывода.");
-                        System.exit(1);
-                    }
+                    outputFormat = args[++i];
+                    break;
+                case "--filter-field":
+                    filterField = args[++i];
+                    break;
+                case "--filter-value":
+                    filterValue = args[++i];
                     break;
                 default:
                     log.error("Ошибка: неизвестный аргумент {}", currentArg);
                     System.exit(1);
             }
+            i++;
         }
 
         if (path == null) {
@@ -89,9 +74,8 @@ public class LogAnalyzerApp {
             return null;
         }
 
-        return new Arguments(path, from, to, outputFormat);
+        return new Arguments(path, from, to, outputFormat, filterField, filterValue);
     }
-
 
     private static void processLog(Arguments arguments) throws IOException {
         LogAnalyzer logAnalyzer = new LogAnalyzer(arguments.path());
@@ -103,9 +87,13 @@ public class LogAnalyzerApp {
             );
         }
 
+        if (arguments.filterField() != null && arguments.filterValue() != null) {
+            logAnalyzer.filterByField(arguments.filterField(), arguments.filterValue());
+        }
+
         LogReport logReport = new LogReport(logAnalyzer, arguments.outputFormat());
         String report = logReport.generateReport(
-            new String[] {arguments.path()},
+            new String[]{arguments.path()},
             arguments.from() != null ? arguments.from().atStartOfDay() : null,
             arguments.to() != null ? arguments.to().atStartOfDay() : null
         );

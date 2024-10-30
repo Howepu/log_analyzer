@@ -42,15 +42,28 @@ public class LogAnalyzer {
 
     // Метод для фильтрации записей по диапазону дат
     public void filterByDateRange(LocalDateTime from, LocalDateTime to) {
-        int beforeFilterCount = records.size();
         records.removeIf(logRecord -> {
             LocalDateTime timestamp = logRecord.timestamp();
             return (from != null && timestamp.isBefore(from)) || (to != null && timestamp.isAfter(to));
         });
-        // Пересчитываем метрики после фильтрации
         resourceCount.clear();
         responseCodeCount.clear();
-        analyzeLogs(); // Повторный анализ уже отфильтрованных записей
+        analyzeLogs();
+    }
+
+    // Метод для фильтрации по значению поля
+    public void filterByField(String field, String value) {
+        records.removeIf(logRecord -> {
+            String fieldValue = switch (field.toLowerCase()) {
+                case "agent" -> logRecord.agent();
+                case "method" -> logRecord.method();
+                default -> null;
+            };
+            return fieldValue == null || !fieldValue.matches(value.replace("*", ".*"));
+        });
+        resourceCount.clear();
+        responseCodeCount.clear();
+        analyzeLogs();
     }
 
     public int getTotalRequests() {
@@ -69,11 +82,10 @@ public class LogAnalyzer {
             .sorted()
             .toList();
         int index = (int) Math.ceil(sizes.size() * 0.95) - 1;
-        if (index < 0) {
-            index = 0;
-            return index;
+        if (index <= 0) {
+            return 0;
         }
-        return sizes.get(Math.min(index, sizes.size() - 1));
+        return sizes.get(Math.max(0, Math.min(index, sizes.size() - 1)));
     }
 
     public Map<String, Integer> getResourceCounts() {

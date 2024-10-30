@@ -27,7 +27,7 @@ public class LogReport {
             report.append("= Общая информация\n\n");
             report.append("| Метрика                  | Значение\n");
             report.append("|--------------------------|------------------------------\n");
-            report.append("| Файл(-ы)                 | `").append(fileNames).append("`\n"); // Используем fileNames
+            report.append("| Файл(-ы)                 | `").append(fileNames).append("`\n");
             report.append("| Начальная дата           | ").append(startDate != null ? startDate.toLocalDate() : "-")
                 .append("\n");
             report.append("| Конечная дата            | ").append(endDate != null ? endDate.toLocalDate() : "-")
@@ -35,13 +35,16 @@ public class LogReport {
             report.append("| Количество запросов      | ").append(analyzer.getTotalRequests()).append("\n");
             report.append("| Средний размер ответа    | ").append(Math.round(analyzer.getAverageResponseSize()))
                 .append(" b\n");
+            report.append("| Процент успешных запросов| ").append(Math.round(analyzer.getSuccessRate())).append(" %\n");
+            report.append("| Количество уникальных IP | ").append(Math.round(analyzer.getUniqueIpCounts()))
+                .append("\n");
             report.append("| 95p размера ответа       | ").append(Math.round(analyzer.get95thPercentileResponseSize()))
                 .append(" b\n\n");
         } else { // Markdown
             report.append("#### Общая информация\n\n");
             report.append("|        Метрика           |     Значение                |\n");
             report.append("|:-------------------------|----------------------------:|\n");
-            report.append("|       Файл(-ы)           | `").append(fileNames).append("` |\n"); // Используем fileNames
+            report.append("|       Файл(-ы)           | `").append(fileNames).append("` |\n");
             report.append("|    Начальная дата        | ").append(startDate != null ? startDate.toLocalDate() : "-")
                 .append(" |\n");
             report.append("|     Конечная дата        | ").append(endDate != null ? endDate.toLocalDate() : "-")
@@ -49,6 +52,9 @@ public class LogReport {
             report.append("|  Количество запросов     | ").append(analyzer.getTotalRequests()).append(" |\n");
             report.append("| Средний размер ответа    | ").append(Math.round(analyzer.getAverageResponseSize()))
                 .append(" b |\n");
+            report.append("| Процент успешных запросов| ").append(Math.round(analyzer.getSuccessRate()))
+                .append(" % |\n");
+            report.append("| Количество уникальных IP | ").append(analyzer.getUniqueIpCounts()).append(" |\n");
             report.append("|  95p размера ответа      | ").append(analyzer.get95thPercentileResponseSize())
                 .append(" b |\n\n");
         }
@@ -86,6 +92,7 @@ public class LogReport {
 
         return report.toString();
     }
+
 
     private String getFileName(String filePath) {
         // Проверяем, является ли путь URL

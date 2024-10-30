@@ -88,6 +88,26 @@ public class LogAnalyzer {
         return sizes.get(Math.max(0, Math.min(index, sizes.size() - 1)));
     }
 
+    // Процент успешных запросов
+    public double getSuccessRate() {
+        long totalRequests = records.size();
+        long successfulRequests = records.stream()
+            .filter(logRecord -> logRecord.status() >= 200 && logRecord.status() < 300)
+            .count();
+        return totalRequests == 0 ? 0 : (double) successfulRequests / totalRequests * 100;
+    }
+
+    // Количество уникальных IP
+    public long getUniqueIpCounts() {
+        long uniqueIpCount = records.stream()
+            .map(LogRecord::ip)
+            .distinct()
+            .count();
+        return uniqueIpCount;
+    }
+
+
+
     public Map<String, Integer> getResourceCounts() {
         return resourceCount;
     }
@@ -95,4 +115,5 @@ public class LogAnalyzer {
     public Map<Integer, Integer> getResponseCodeCounts() {
         return responseCodeCount;
     }
+
 }

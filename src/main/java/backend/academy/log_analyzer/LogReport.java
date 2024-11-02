@@ -55,7 +55,7 @@ public class LogReport {
             report.append("| Процент успешных запросов| ").append(Math.round(analyzer.getSuccessRate()))
                 .append(" % |\n");
             report.append("| Количество уникальных IP | ").append(analyzer.getUniqueIpCounts()).append(" |\n");
-            report.append("|  95p размера ответа      | ").append(analyzer.get95thPercentileResponseSize())
+            report.append("|  95p размера ответа      | ").append(Math.round(analyzer.get95thPercentileResponseSize()))
                 .append(" b |\n\n");
         }
 

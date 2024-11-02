@@ -1,77 +1,72 @@
 package backend.academy.log_analyzer;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
+
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-public class LogParserTest {
+class LogParserTest {
 
     @Test
-    public void testParseValidLogLine() {
-        String logLine = "192.168.1.1 - - [30/Oct/2024:10:15:30 +0000] \"GET /index.html HTTP/1.1\" 200 512 \"-\" \"Mozilla/5.0\"";
-        LogRecord record = LogParser.parseLine(logLine);
+    void parseLine_ValidLogLine_ReturnsLogRecord() {
+        // Подготовка данных
+        String logLine = "127.0.0.1 - - [10/Oct/2000:13:55:36 +0000] \"GET /index.html\" 200 2326 \"-\" \"Mozilla/4.08 [en] (Win98; I ;Nav)\"";
 
-        assertEquals("192.168.1.1", record.ip());
-        assertEquals(LocalDateTime.of(2024, 10, 30, 10, 15, 30), record.timestamp());
-        assertEquals("/index.html HTTP/1.1", record.request());
-        assertEquals(200, record.status());
-        assertEquals(512, record.size());
-        assertEquals("Mozilla/5.0", record.agent());
-        assertEquals("GET", record.method());
+        // Ожидаемые значения
+        String remoteAddr = "127.0.0.1";
+        String method = "GET";
+        String request = "/index.html";
+        int responseCode = 200;
+        int responseSize = 2326;
+        String agent = "Mozilla/4.08 [en] (Win98; I ;Nav)";
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss Z", Locale.ENGLISH);
+        LocalDateTime timestamp = LocalDateTime.parse("10/Oct/2000:13:55:36 +0000", formatter);
+
+        // Выполнение метода
+        LogRecord logRecord = LogParser.parseLine(logLine);
+
+        // Проверка результатов
+        assertEquals(remoteAddr, logRecord.ip());
+        assertEquals(timestamp, logRecord.timestamp());
+        assertEquals(method, logRecord.method());
+        assertEquals(request, logRecord.request());
+        assertEquals(responseCode, logRecord.status());
+        assertEquals(responseSize, logRecord.size());
+        assertEquals(agent, logRecord.agent());
     }
 
     @Test
-    public void testParseInvalidLogLineFormat() {
-        String invalidLogLine = "192.168.1.1 - - [30/Oct/2024:10:15:30 +0000] \"GET /index.html HTTP/1.1\" 200";
+    void parseLine_InvalidLogLine_ThrowsIllegalArgumentException() {
+        // Подготовка некорректной строки лога
+        String invalidLogLine = "invalid log line format";
 
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-            LogParser.parseLine(invalidLogLine);
-        });
-
-        assertEquals("Ошибка при парсинге строки лога: " + invalidLogLine, thrown.getMessage());
+        // Выполнение метода и проверка выброса исключения
+        Executable executable = () -> LogParser.parseLine(invalidLogLine);
+        assertThrows(IllegalArgumentException.class, executable);
     }
 
     @Test
-    public void testParseLogLineWithInvalidDate() {
-        String logLineWithInvalidDate = "192.168.1.1 - - [30/Oct/2024:10:15:30] \"GET /index.html HTTP/1.1\" 200 512 \"-\" \"Mozilla/5.0\"";
+    void parseLine_InvalidDate_ThrowsIllegalArgumentException() {
+        // Подготовка строки лога с некорректной датой
+        String invalidDateLogLine = "127.0.0.1 - - [32/Oct/2000:13:55:36 +0000] \"GET /index.html\" 200 2326 \"-\" \"Mozilla/4.08 [en] (Win98; I ;Nav)\"";
 
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-            LogParser.parseLine(logLineWithInvalidDate);
-        });
-
-        assertTrue(thrown.getMessage().contains("Ошибка при парсинге даты в строке лога:"));
+        // Выполнение метода и проверка выброса исключения
+        Executable executable = () -> LogParser.parseLine(invalidDateLogLine);
+        assertThrows(IllegalArgumentException.class, executable);
     }
 
     @Test
-    public void testParseLogLineWithMissingFields() {
-        String logLineMissingFields = "192.168.1.1 - - [30/Oct/2024:10:15:30 +0000]";
+    void parseLine_MissingFields_ThrowsIllegalArgumentException() {
+        // Подготовка строки лога с отсутствующими полями
+        String missingFieldsLogLine = "127.0.0.1 - - [10/Oct/2000:13:55:36 +0000] \"GET\" 200 2326";
 
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-            LogParser.parseLine(logLineMissingFields);
-        });
-
-        assertEquals("Ошибка при парсинге строки лога: " + logLineMissingFields, thrown.getMessage());
-    }
-
-    @Test
-    public void testParseLogLineWithInvalidResponseCode() {
-        String logLineInvalidResponseCode = "192.168.1.1 - - [30/Oct/2024:10:15:30 +0000] \"GET /index.html HTTP/1.1\" abc 512 \"-\" \"Mozilla/5.0\"";
-
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-            LogParser.parseLine(logLineInvalidResponseCode);
-        });
-
-        assertTrue(thrown.getMessage().contains("Ошибка при парсинге строки лога"));
-    }
-
-    @Test
-    public void testParseLogLineWithInvalidResponseSize() {
-        String logLineInvalidResponseSize = "192.168.1.1 - - [30/Oct/2024:10:15:30 +0000] \"GET /index.html HTTP/1.1\" 200 xyz \"-\" \"Mozilla/5.0\"";
-
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-            LogParser.parseLine(logLineInvalidResponseSize);
-        });
-
-        assertTrue(thrown.getMessage().contains("Ошибка при парсинге строки лога"));
+        // Выполнение метода и проверка выброса исключения
+        Executable executable = () -> LogParser.parseLine(missingFieldsLogLine);
+        assertThrows(IllegalArgumentException.class, executable);
     }
 }

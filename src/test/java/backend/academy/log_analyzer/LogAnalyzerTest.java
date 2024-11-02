@@ -80,4 +80,5 @@ class LogAnalyzerTest {
         assertEquals(1, logAnalyzer.getResponseCodeCounts().get(201), "Response code count for 201 should be 1.");
         assertEquals(1, logAnalyzer.getResponseCodeCounts().get(304), "Response code count for 304 should be 1.");
     }
+
 }

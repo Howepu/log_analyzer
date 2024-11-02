@@ -101,7 +101,7 @@ public class LogAnalyzerApp {
                 arguments.to() != null ? arguments.to().atStartOfDay() : null
             );
 
-            log.info("\nОтчет для файла {}:\n {}", path, report);
+            log.info("\n {}", report);
         }
     }
 

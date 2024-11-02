@@ -3,9 +3,10 @@ package backend.academy.log_analyzer;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
-@SuppressWarnings("checkstyle:UncommentedMain")
 @Slf4j
 public class LogAnalyzerApp {
 
@@ -32,7 +33,7 @@ public class LogAnalyzerApp {
     }
 
     private static Arguments parseArguments(String[] args) {
-        String path = null;
+        List<String> paths = new ArrayList<>();
         LocalDate from = null;
         LocalDate to = null;
         String outputFormat = null;
@@ -45,7 +46,7 @@ public class LogAnalyzerApp {
             String currentArg = args[i];
             switch (currentArg) {
                 case "--path":
-                    path = args[++i];
+                    paths.add(args[++i]);
                     break;
                 case "--from":
                     from = LocalDate.parse(args[++i], dateFormatter);
@@ -69,35 +70,38 @@ public class LogAnalyzerApp {
             i++;
         }
 
-        if (path == null) {
+        if (paths.isEmpty()) {
             log.error("Ошибка: путь к лог-файлам обязателен.");
             return null;
         }
 
-        return new Arguments(path, from, to, outputFormat, filterField, filterValue);
+        return new Arguments(paths, from, to, outputFormat, filterField, filterValue);
     }
 
     private static void processLog(Arguments arguments) throws IOException {
-        LogAnalyzer logAnalyzer = new LogAnalyzer(arguments.path());
+        for (String path : arguments.paths()) {
+            LogAnalyzer logAnalyzer = new LogAnalyzer(path);
 
-        if (arguments.from() != null || arguments.to() != null) {
-            logAnalyzer.filterByDateRange(
+            if (arguments.from() != null || arguments.to() != null) {
+                logAnalyzer.filterByDateRange(
+                    arguments.from() != null ? arguments.from().atStartOfDay() : null,
+                    arguments.to() != null ? arguments.to().atStartOfDay() : null
+                );
+            }
+
+            if (arguments.filterField() != null && arguments.filterValue() != null) {
+                logAnalyzer.filterByField(arguments.filterField(), arguments.filterValue());
+            }
+
+            LogReport logReport = new LogReport(logAnalyzer, arguments.outputFormat());
+            String report = logReport.generateReport(
+                arguments.paths().toArray(new String[0]), // исправлено на arguments.paths()
                 arguments.from() != null ? arguments.from().atStartOfDay() : null,
                 arguments.to() != null ? arguments.to().atStartOfDay() : null
             );
+
+            log.info("\nОтчет для файла {}:\n {}", path, report);
         }
-
-        if (arguments.filterField() != null && arguments.filterValue() != null) {
-            logAnalyzer.filterByField(arguments.filterField(), arguments.filterValue());
-        }
-
-        LogReport logReport = new LogReport(logAnalyzer, arguments.outputFormat());
-        String report = logReport.generateReport(
-            new String[]{arguments.path()},
-            arguments.from() != null ? arguments.from().atStartOfDay() : null,
-            arguments.to() != null ? arguments.to().atStartOfDay() : null
-        );
-
-        log.info("\n {}", report);
     }
+
 }

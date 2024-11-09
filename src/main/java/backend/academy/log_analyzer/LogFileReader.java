@@ -15,30 +15,33 @@ import java.util.stream.Stream;
 
 public class LogFileReader {
 
-    public List<String> loadLogs(String path) throws Exception {
-        if (path.startsWith("https://") || path.startsWith("http://")) {
-            // Чтение логов через HTTP
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(path))
-                .GET()
-                .build();
+    public List<String> loadLogs(List<String> paths) throws Exception {
+        for (String path : paths) {
+            if (path.startsWith("https://") || path.startsWith("http://")) {
+                // Чтение логов через HTTP
+                HttpClient client = HttpClient.newHttpClient();
+                HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(path))
+                    .GET()
+                    .build();
 
-            HttpResponse<Stream<String>> response = client.send(request, HttpResponse.BodyHandlers.ofLines());
+                HttpResponse<Stream<String>> response = client.send(request, HttpResponse.BodyHandlers.ofLines());
 
-            // Сбор строк в список
-            return response.body().collect(Collectors.toList());
-        } else {
-            // Локальное чтение логов (осталось без изменений)
-            Path filePath = Paths.get(path);
-            try (BufferedReader reader = Files.newBufferedReader(filePath)) {
-                List<String> lines = new ArrayList<>();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    lines.add(line);
+                // Сбор строк в список
+                return response.body().collect(Collectors.toList());
+            } else {
+                // Локальное чтение логов (осталось без изменений)
+                Path filePath = Paths.get(path);
+                try (BufferedReader reader = Files.newBufferedReader(filePath)) {
+                    List<String> lines = new ArrayList<>();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        lines.add(line);
+                    }
+                    return lines;
                 }
-                return lines;
             }
         }
+        return paths;
     }
 }

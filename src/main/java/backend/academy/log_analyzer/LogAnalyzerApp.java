@@ -1,6 +1,5 @@
 package backend.academy.log_analyzer;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -80,29 +79,30 @@ public class LogAnalyzerApp {
     }
 
     private static void processLog(Arguments arguments) throws Exception {
-        for (String path : arguments.paths()) {
-            LogAnalyzer logAnalyzer = new LogAnalyzer(path);
+        // Вместо создания LogAnalyzer для каждого файла, объединяем данные из всех файлов в один LogAnalyzer
+        LogAnalyzer logAnalyzer = new LogAnalyzer(arguments.paths());
 
-            if (arguments.from() != null || arguments.to() != null) {
-                logAnalyzer.filterByDateRange(
-                    arguments.from() != null ? arguments.from().atStartOfDay() : null,
-                    arguments.to() != null ? arguments.to().atStartOfDay() : null
-                );
-            }
-
-            if (arguments.filterField() != null && arguments.filterValue() != null) {
-                logAnalyzer.filterByField(arguments.filterField(), arguments.filterValue());
-            }
-
-            LogReport logReport = new LogReport(logAnalyzer, arguments.outputFormat());
-            String report = logReport.generateReport(
-                arguments.paths().toArray(new String[0]), // исправлено на arguments.paths()
+        // Применение фильтров
+        if (arguments.from() != null || arguments.to() != null) {
+            logAnalyzer.filterByDateRange(
                 arguments.from() != null ? arguments.from().atStartOfDay() : null,
                 arguments.to() != null ? arguments.to().atStartOfDay() : null
             );
-
-            log.info("\n {}", report);
         }
+
+        if (arguments.filterField() != null && arguments.filterValue() != null) {
+            logAnalyzer.filterByField(arguments.filterField(), arguments.filterValue());
+        }
+
+        // Генерация отчёта по всем данным
+        LogReport logReport = new LogReport(logAnalyzer, arguments.outputFormat());
+        String report = logReport.generateReport(
+            arguments.paths().toArray(new String[0]), // Путь к файлам
+            arguments.from() != null ? arguments.from().atStartOfDay() : null,
+            arguments.to() != null ? arguments.to().atStartOfDay() : null
+        );
+
+        log.info("\n {}", report);
     }
 
 }

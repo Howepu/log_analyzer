@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,7 +31,7 @@ class LogAnalyzerTest {
         Files.writeString(tempLogFile, logContent);
 
         // Инициализация LogAnalyzer с путём к временной записи
-        logAnalyzer = new LogAnalyzer(tempLogFile.toString());
+        logAnalyzer = new LogAnalyzer(Collections.singletonList(tempLogFile.toString()));
     }
 
     @AfterEach

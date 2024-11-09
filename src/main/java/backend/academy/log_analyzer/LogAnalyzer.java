@@ -1,6 +1,5 @@
 package backend.academy.log_analyzer;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,9 +14,9 @@ public class LogAnalyzer {
     private final Map<String, Integer> resourceCount = new HashMap<>();
     private final Map<Integer, Integer> responseCodeCount = new HashMap<>();
 
-    public LogAnalyzer(String path) throws Exception {
+    public LogAnalyzer(List<String> paths) throws Exception {
         LogFileReader logFileReader = new LogFileReader();
-        List<String> logLines = logFileReader.loadLogs(path);
+        List<String> logLines = logFileReader.loadLogs(paths);
         parseLogLines(logLines);
         analyzeLogs();
     }

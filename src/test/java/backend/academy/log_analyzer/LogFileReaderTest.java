@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,7 +30,7 @@ public class LogFileReaderTest {
         // Проверяем, что файл существует
         assertTrue(Files.exists(Paths.get(LOG_FILE_PATH)), "Файл логов не найден по указанному пути: " + LOG_FILE_PATH);
 
-        List<String> lines = logFileReader.loadLogs(LOG_FILE_PATH);
+        List<String> lines = logFileReader.loadLogs(Collections.singletonList(LOG_FILE_PATH));
 
         // Проверяем, что содержимое загруженных логов не пустое
         assertFalse(lines.isEmpty(), "Файл логов не должен быть пустым");
@@ -41,7 +42,7 @@ public class LogFileReaderTest {
 
     @Test
     public void testLoadLogsFromUrl() throws Exception {
-        List<String> lines = logFileReader.loadLogs(URL);
+        List<String> lines = logFileReader.loadLogs(Collections.singletonList(URL));
 
         // Проверяем, что строка не пуста и содержит ожидаемое значение
         assertFalse(lines.isEmpty(), "Логи не должны быть пустыми из URL");

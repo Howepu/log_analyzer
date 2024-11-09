@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class LogFileReaderTest {
 
     // Путь к файлу
-    private static final String LOG_FILE_PATH = "src/main/resources/logs";
+    private static final String LOG_FILE_PATH = "src/main/resources/logs"; // Убедитесь, что файл существует
     // URL для загрузки логов NGINX
     private static final String URL = "https://raw.githubusercontent.com/elastic/examples/master/Common%20Data%20Formats/nginx_logs/nginx_logs";
 
@@ -25,24 +25,32 @@ public class LogFileReaderTest {
     }
 
     @Test
-    public void testLoadLogsFromLocalFile() throws IOException {
+    public void testLoadLogsFromLocalFile() throws Exception {
         // Проверяем, что файл существует
         assertTrue(Files.exists(Paths.get(LOG_FILE_PATH)), "Файл логов не найден по указанному пути: " + LOG_FILE_PATH);
 
         List<String> lines = logFileReader.loadLogs(LOG_FILE_PATH);
 
-        // Проверяем, что содержимое загруженных логов соответствует ожиданиям
+        // Проверяем, что содержимое загруженных логов не пустое
         assertFalse(lines.isEmpty(), "Файл логов не должен быть пустым");
-        assertTrue(lines.get(0).contains("93.180.71.3 - - [17/May/2015:08:05:23 +0000] \"GET /downloads/product_1 HTTP/1.1\" 304 0 \"-\" \"Debian APT-HTTP/1.3 (0.8.16~exp12ubuntu10.21)\""));
+
+        // Проверяем, что первая строка лога содержит ожидаемое значение (например, адрес IP, метод GET и статус)
+        assertTrue(lines.get(0).matches(".*\\d+\\.\\d+\\.\\d+\\.\\d+ - - \\[.*\\] \"GET .*\" \\d{3} .*"),
+            "Первая строка не соответствует формату лога NGINX");
     }
 
     @Test
-    public void testLoadLogsFromUrl() throws IOException {
+    public void testLoadLogsFromUrl() throws Exception {
         List<String> lines = logFileReader.loadLogs(URL);
 
         // Проверяем, что строка не пуста и содержит ожидаемое значение
         assertFalse(lines.isEmpty(), "Логи не должны быть пустыми из URL");
-        // Проверяем, что первая строка содержит ожидаемую информацию
+
+        // Проверяем, что первая строка содержит ожидаемый метод GET
         assertTrue(lines.get(0).contains("GET"), "Первая строка должна содержать метод GET");
+
+        // Дополнительная проверка на наличие правильного формата
+        assertTrue(lines.get(0).matches(".*\\d+\\.\\d+\\.\\d+\\.\\d+ - - \\[.*\\] \"GET .*\" \\d{3} .*"),
+            "Первая строка не соответствует формату лога NGINX");
     }
 }

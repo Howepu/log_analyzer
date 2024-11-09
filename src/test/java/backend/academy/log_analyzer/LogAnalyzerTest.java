@@ -16,7 +16,7 @@ class LogAnalyzerTest {
     private Path tempLogFile;
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() throws Exception {
         // Создание временного файла с логами
         tempLogFile = Files.createTempFile("testLogs", ".log");
 

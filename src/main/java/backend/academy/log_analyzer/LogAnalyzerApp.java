@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
-@SuppressWarnings("checkstyle:UncommentedMain")
 @Slf4j
 public class LogAnalyzerApp {
 
@@ -79,7 +78,7 @@ public class LogAnalyzerApp {
     }
 
     private static void processLog(Arguments arguments) throws Exception {
-        // Вместо создания LogAnalyzer для каждого файла, объединяем данные из всех файлов в один LogAnalyzer
+        // Создаём LogAnalyzer с данными всех файлов
         LogAnalyzer logAnalyzer = new LogAnalyzer(arguments.paths());
 
         // Применение фильтров
@@ -97,12 +96,11 @@ public class LogAnalyzerApp {
         // Генерация отчёта по всем данным
         LogReport logReport = new LogReport(logAnalyzer, arguments.outputFormat());
         String report = logReport.generateReport(
-            arguments.paths().toArray(new String[0]), // Путь к файлам
+            arguments.paths().toArray(new String[0]),
             arguments.from() != null ? arguments.from().atStartOfDay() : null,
             arguments.to() != null ? arguments.to().atStartOfDay() : null
         );
 
-        log.info("\n {}", report);
+        log.info("\n{}", report);
     }
-
 }

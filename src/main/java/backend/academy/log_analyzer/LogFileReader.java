@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 public class LogFileReader {
 
     public List<String> loadLogs(List<String> paths) throws Exception {
+        List<String> allLines = new ArrayList<>();
         for (String path : paths) {
             if (path.startsWith("https://") || path.startsWith("http://")) {
                 // Чтение логов через HTTP
@@ -26,22 +27,15 @@ public class LogFileReader {
                     .build();
 
                 HttpResponse<Stream<String>> response = client.send(request, HttpResponse.BodyHandlers.ofLines());
-
-                // Сбор строк в список
-                return response.body().collect(Collectors.toList());
+                allLines.addAll(response.body().collect(Collectors.toList()));
             } else {
-                // Локальное чтение логов (осталось без изменений)
+                // Локальное чтение логов
                 Path filePath = Paths.get(path);
                 try (BufferedReader reader = Files.newBufferedReader(filePath)) {
-                    List<String> lines = new ArrayList<>();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        lines.add(line);
-                    }
-                    return lines;
+                    allLines.addAll(reader.lines().collect(Collectors.toList()));
                 }
             }
         }
-        return paths;
+        return allLines;
     }
 }

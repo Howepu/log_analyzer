@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 
-@SuppressWarnings("checkstyle:MagicNumber")
 @Slf4j
 public class LogAnalyzer {
     private final List<LogRecord> records = new ArrayList<>();
@@ -39,7 +38,6 @@ public class LogAnalyzer {
         }
     }
 
-    // Метод для фильтрации записей по диапазону дат
     public void filterByDateRange(LocalDateTime from, LocalDateTime to) {
         records.removeIf(logRecord -> {
             LocalDateTime timestamp = logRecord.timestamp();
@@ -50,7 +48,6 @@ public class LogAnalyzer {
         analyzeLogs();
     }
 
-    // Метод для фильтрации по значению поля
     public void filterByField(String field, String value) {
         records.removeIf(logRecord -> {
             String fieldValue = switch (field.toLowerCase()) {
@@ -87,7 +84,6 @@ public class LogAnalyzer {
         return sizes.get(Math.max(0, Math.min(index, sizes.size() - 1)));
     }
 
-    // Процент успешных запросов
     public double getSuccessRate() {
         long totalRequests = records.size();
         long successfulRequests = records.stream()
@@ -96,7 +92,6 @@ public class LogAnalyzer {
         return totalRequests == 0 ? 0 : (double) successfulRequests / totalRequests * 100;
     }
 
-    // Количество уникальных IP
     public long getUniqueIpCounts() {
         long uniqueIpCount = records.stream()
             .map(LogRecord::ip)
@@ -105,8 +100,6 @@ public class LogAnalyzer {
         return uniqueIpCount;
     }
 
-
-
     public Map<String, Integer> getResourceCounts() {
         return resourceCount;
     }
@@ -114,7 +107,4 @@ public class LogAnalyzer {
     public Map<Integer, Integer> getResponseCodeCounts() {
         return responseCodeCount;
     }
-
-
-
 }

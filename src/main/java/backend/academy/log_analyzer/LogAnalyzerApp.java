@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
+@SuppressWarnings("checkstyle:UncommentedMain")
 @Slf4j
 public class LogAnalyzerApp {
 

@@ -15,7 +15,7 @@ public class LogAnalyzer {
     private final Map<String, Integer> resourceCount = new HashMap<>();
     private final Map<Integer, Integer> responseCodeCount = new HashMap<>();
 
-    public LogAnalyzer(String path) throws IOException {
+    public LogAnalyzer(String path) throws Exception {
         LogFileReader logFileReader = new LogFileReader();
         List<String> logLines = logFileReader.loadLogs(path);
         parseLogLines(logLines);
@@ -115,5 +115,7 @@ public class LogAnalyzer {
     public Map<Integer, Integer> getResponseCodeCounts() {
         return responseCodeCount;
     }
+
+
 
 }

@@ -28,7 +28,7 @@ public class LogAnalyzerApp {
 
         try {
             processLog(arguments);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("Ошибка при анализе логов: {}", e.getMessage());
         }
     }
@@ -79,7 +79,7 @@ public class LogAnalyzerApp {
         return new Arguments(paths, from, to, outputFormat, filterField, filterValue);
     }
 
-    private static void processLog(Arguments arguments) throws IOException {
+    private static void processLog(Arguments arguments) throws Exception {
         for (String path : arguments.paths()) {
             LogAnalyzer logAnalyzer = new LogAnalyzer(path);
 

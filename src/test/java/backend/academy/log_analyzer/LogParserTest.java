@@ -13,10 +13,10 @@ class LogParserTest {
 
     @Test
     void parseLine_ValidLogLine_ReturnsLogRecord() {
-        // Подготовка данных
+
         String logLine = "127.0.0.1 - - [10/Oct/2000:13:55:36 +0000] \"GET /index.html\" 200 2326 \"-\" \"Mozilla/4.08 [en] (Win98; I ;Nav)\"";
 
-        // Ожидаемые значения
+
         String remoteAddr = "127.0.0.1";
         String method = "GET";
         String request = "/index.html";
@@ -42,10 +42,8 @@ class LogParserTest {
 
     @Test
     void parseLine_InvalidLogLine_ThrowsIllegalArgumentException() {
-        // Подготовка некорректной строки лога
         String invalidLogLine = "invalid log line format";
 
-        // Выполнение метода и проверка выброса исключения
         Executable executable = () -> LogParser.parseLine(invalidLogLine);
         assertThrows(IllegalArgumentException.class, executable);
     }

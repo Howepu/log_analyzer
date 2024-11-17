@@ -79,7 +79,7 @@ public class LogAnalyzerApp {
     }
 
     private static void processLog(Arguments arguments) throws Exception {
-        // Создаём LogAnalyzer с данными всех файлов
+
         LogAnalyzer logAnalyzer = new LogAnalyzer(arguments.paths());
 
         // Применение фильтров

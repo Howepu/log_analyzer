@@ -50,18 +50,32 @@ public class LogAnalyzer {
     }
 
     public void filterByField(String field, String value) {
+        if (field == null || value == null) {
+            log.warn("Фильтрация по полю пропущена: field={}, value={}", field, value);
+            return;
+        }
+
         records.removeIf(logRecord -> {
             String fieldValue = switch (field.toLowerCase()) {
                 case "agent" -> logRecord.agent();
                 case "method" -> logRecord.method();
                 default -> null;
             };
-            return fieldValue == null || !fieldValue.matches(value.replace("*", ".*"));
+
+            if (fieldValue == null) {
+                log.warn("Поле {} отсутствует в записи {}", field, logRecord);
+                return true; // Удаляем запись, если поле отсутствует
+            }
+
+            boolean matches = fieldValue.matches(value.replace("*", ".*"));
+            return !matches; // Удаляем, если не совпадает
         });
+
         resourceCount.clear();
         responseCodeCount.clear();
         analyzeLogs();
     }
+
 
     public int getTotalRequests() {
         return records.size();

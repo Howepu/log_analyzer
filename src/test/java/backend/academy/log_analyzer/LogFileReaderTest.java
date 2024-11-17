@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class LogFileReaderTest {
 
     // Путь к файлу
-    private static final String LOG_FILE_PATH = "src/main/resources/logs/logs.log";
+    private static final String LOG_FILE_PATH = "src/main/resources/logs.log";
     // URL для загрузки логов NGINX
     private static final String URL = "https://raw.githubusercontent.com/elastic/examples/master/Common%20Data%20Formats/nginx_logs/nginx_logs";
 

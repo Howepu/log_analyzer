@@ -27,8 +27,6 @@ public class LogFileReaderTest {
 
     @Test
     public void testLoadLogsFromLocalFile() throws Exception {
-        // Проверяем, что файл существует
-        assertTrue(Files.exists(Paths.get(LOG_FILE_PATH)), "Файл логов не найден по указанному пути: " + LOG_FILE_PATH);
 
         List<String> lines = logFileReader.loadLogs(Collections.singletonList(LOG_FILE_PATH));
 

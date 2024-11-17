@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class LogFileReaderTest {
 
     // Путь к файлу
-    private static final String LOG_FILE_PATH = "src/test/java/backend/academy/log_analyzer/logs.log";
+    private static final String LOG_FILE_PATH = "src/test/java/backend/academy/log_analyzer/logs";
     // URL для загрузки логов NGINX
     private static final String URL = "https://raw.githubusercontent.com/elastic/examples/master/Common%20Data%20Formats/nginx_logs/nginx_logs";
 
@@ -27,6 +27,8 @@ public class LogFileReaderTest {
 
     @Test
     public void testLoadLogsFromLocalFile() throws Exception {
+        // Проверяем, что файл существует
+        assertTrue(Files.exists(Paths.get(LOG_FILE_PATH)), "Файл логов не найден по указанному пути: " + LOG_FILE_PATH);
 
         List<String> lines = logFileReader.loadLogs(Collections.singletonList(LOG_FILE_PATH));
 

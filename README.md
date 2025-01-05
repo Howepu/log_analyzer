@@ -1,137 +1,85 @@
-# Шаблон Java-проекта для домашних заданий
+# Log Analyzer
 
-Шаблон для домашних заданий [Академии Бэкенда 2024][course-url].
+The **Log Analyzer** is a utility that processes NGINX log files to provide insightful statistics about web traffic. It can parse both local log files and logs accessible via a URL. The program is designed to make log analysis easy by automating tasks like counting requests, identifying frequent resources, calculating average response sizes, and more.
 
-Цель данного репозитория – познакомить вас с процессом разработки приложений на
-Java с использованием наиболее распространенных практик, инструментов и
-библиотек.
+## Features
 
-## Структура проекта
+- **Count the total number of requests**
+- **Identify the most requested resources**
+- **Determine the most common HTTP response codes**
+- **Calculate the average response size**
+- **Calculate the 95th percentile of response sizes**
 
-Это типовой Java-проект, который собирается с помощью инструмента автоматической
-сборки проектов [Apache Maven](https://maven.apache.org/).
+## Requirements
 
-Проект состоит из следующих директорий и файлов:
+- Java 21 or higher
+- Maven
+- Internet access for URL-based log files (if necessary)
 
-- [pom.xml](./pom.xml) – дескриптор сборки, используемый maven, или Project
-  Object Model. В нем описаны зависимости проекта и шаги по его сборке
-- [src/](./src) – директория, которая содержит исходный код приложения и его
-  тесты:
-  - [src/main/](./src/main) – здесь находится код вашего приложения
-  - [src/test/](./src/test) – здесь находятся тесты вашего приложения
-- [mvnw](./mvnw) и [mvnw.cmd](./mvnw.cmd) – скрипты maven wrapper для Unix и
-  Windows, которые позволяют запускать команды maven без локальной установки
-- [checkstyle.xml](checkstyle.xml),
-  [checkstyle-suppression.xml](checkstyle-suppression.xml), [pmd.xml](pmd.xml) и
-  [spotbugs-excludes.xml](spotbugs-excludes.xml) – в проекте используются
-  [линтеры](https://en.wikipedia.org/wiki/Lint_%28software%29) для контроля
-  качества кода. Указанные файлы содержат правила для используемых линтеров
-- [.mvn/](./.mvn) – служебная директория maven, содержащая конфигурационные
-  параметры сборщика
-- [lombok.config](lombok.config) – конфигурационный файл
-  [Lombok](https://projectlombok.org/), библиотеки помогающей избежать рутинного
-  написания шаблонного кода
-- [.editorconfig](.editorconfig) – файл с описанием настроек форматирования кода
-- [.github/workflows/build.yml](.github/workflows/build.yml) – файл с описанием
-  шагов сборки проекта в среде Github
-- [.gitattributes](.gitattributes), [.gitignore](.gitignore) – служебные файлы
-  для git, с описанием того, как обрабатывать различные файлы, и какие из них
-  игнорировать
+## Installation
 
-## Начало работы
+1. Clone the repository or download the source code.
+2. Install the analyzer script to easily run the utility from the command line.
 
-Подробнее о том, как приступить к разработке, описано в разделах
-[курса][course-url] `1.8 Настройка IDE`, `1.9 Работа с Git` и
-`1.10 Настройка SSH`.
-
-Для того чтобы собрать проект, и проверить, что все работает корректно, можно
-запустить из модального окна IDEA
-[Run Anything](https://www.jetbrains.com/help/idea/running-anything.html)
-команду:
-
-```shell
-mvn clean verify
+```bash
+chmod +x install.sh && ./install.sh
 ```
 
-Альтернативно можно в терминале из корня проекта выполнить следующие команды.
+3. The program will be available as the analyzer command in your terminal.
 
-Для Unix (Linux, macOS, Cygwin, WSL):
+## Usage
+The program takes the following command-line arguments:
 
-```shell
-./mvnw clean verify
+- --path: Path to one or more NGINX log files (can be a local path or URL).
+- --from: Optional start date in ISO8601 format (e.g., 2024-08-31).
+- --to: Optional end date in ISO8601 format (e.g., 2024-09-01).
+- --format: Optional output format, either markdown or adoc.
+- --filter-field: Optional field to filter logs by (e.g., agent, method).
+- --filter-value: Optional value to match in the --filter-field (e.g., "Mozilla*", "GET").
+
+## Examples:
+### Basic usage:
+```bash
+analyzer --path src/main/resources/logs.log --format adoc
+```
+```bash
+analyzer --path https://raw.githubusercontent.com/elastic/examples/master/Common%20Data%20Formats/nginx_logs/nginx_logs --format adoc
+```
+```bash
+analyzer --path src/main/resources/logs.log --from 2014-01-02 --to 2020-02-05 --format markdown
 ```
 
-Для Windows:
-
-```shell
-mvnw.cmd clean verify
+### Filter by specific field:
+```bash
+analyzer --path logs/2024* --filter-field agent --filter-value "Mozilla*"
 ```
+This command filters logs based on the agent field, showing only entries where the user-agent starts with "Mozilla".
 
-Для окончания сборки потребуется подождать какое-то время, пока maven скачает
-все необходимые зависимости, скомпилирует проект и прогонит базовый набор
-тестов.
-
-Если вы в процессе сборки получили ошибку:
-
-```shell
-Rule 0: org.apache.maven.enforcer.rules.version.RequireJavaVersion failed with message:
-JDK version must be at least 22
+```bash
+analyzer --path logs/2024* --filter-field method --filter-value "GET"
 ```
+This command filters logs based on the method field, showing only entries with the HTTP method "GET".
 
-Значит, версия вашего JDK ниже 22.
 
-Если же получили ошибку:
 
-```shell
-Rule 1: org.apache.maven.enforcer.rules.version.RequireMavenVersion failed with message:
-Maven version should, at least, be 3.8.8
-```
 
-Значит, у вас используется версия maven ниже 3.8.8. Такого не должно произойти,
-если вы запускаете сборку из IDEA или через `mvnw`-скрипты.
+## Output Format
+The program will output the analysis in either markdown or adoc format, depending on the selected output format. Here is an example of the output:
 
-Далее будут перечислены другие полезные команды maven.
+- [Markdown](analyzer_output.md)
 
-Запуск только компиляции основных классов:
+- [Asciidoc](analyzer_output.adoc)
 
-```shell
-mvn compile
-```
+## How It Works
+The program reads the NGINX log files either from local paths or remote URLs.
+If specified, the program filters logs by date range (from and to parameters).
+The program then parses each log entry and transforms it into a structured object.
+Statistics are collected during the parsing process in a single pass through the data.
+Finally, the results are formatted into a markdown or AsciiDoc report.
 
-Запуск тестов:
-
-```shell
-mvn test
-```
-
-Запуск линтеров:
-
-```shell
-mvn checkstyle:check modernizer:modernizer spotbugs:check pmd:check pmd:cpd-check
-```
-
-Вывод дерева зависимостей проекта (полезно при отладке транзитивных
-зависимостей):
-
-```shell
-mvn dependency:tree
-```
-
-Вывод вспомогательной информации о любом плагине (вместо `compiler` можно
-подставить интересующий вас плагин):
-
-```shell
-mvn help:describe -Dplugin=compiler
-```
-
-## Дополнительные материалы
-
-- Документация по maven: https://maven.apache.org/guides/index.html
-- Поиск зависимостей и их версий: https://central.sonatype.com/search
-- Документация по процессу автоматизированной сборки в среде github:
-  https://docs.github.com/en/actions
-- Документация по git: https://git-scm.com/doc
-- Javadoc для Java 22:
-  https://docs.oracle.com/en/java/javase/22/docs/api/index.html
-
-[course-url]: https://edu.tinkoff.ru/all-activities/courses/870efa9d-7067-4713-97ae-7db256b73eab
+## Limitations & Tips
+Log Format: Ensure that the logs conform to the standard NGINX log format for proper parsing.
+Memory Efficiency: The program uses stream-based processing to handle large log files without loading them entirely into memory.
+Data Processing: All statistics are calculated in a single pass over the data, making the program efficient.
+Date Handling: Use Java's modern time API for date filtering.
+Statistics Collection: Use collections like lists or maps to collect statistics efficiently.
